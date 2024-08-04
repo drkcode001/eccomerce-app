@@ -1,7 +1,10 @@
+// File: src/main/java/com/myecommerce/eccomerceapp/model/User.java
+
 package com.myecommerce.eccomerceapp.model;
 
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -10,9 +13,30 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String username;
-    private String email;
-    private String password; // Note: In a real app, we'd hash this password
 
-    // Why separate username and email? It allows for more flexible user identification options.
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;  // This will store the hashed password
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }
+
+// Why not use @Table(name = "users")?
+// In H2, "USER" is not a reserved keyword, so we can use it as our table name.
+// H2 will automatically create a table named "USER" (in uppercase) for this entity.
+
+// Why use @Column annotations?
+// They allow us to specify constraints directly in our entity, ensuring data integrity at the database level.
+
+// Why include a createdAt field with @PrePersist?
+// This automatically timestamps when a user is created, which can be useful for auditing and data analysis.
